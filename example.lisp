@@ -1,18 +1,16 @@
-; This example shows how database commands can be executed.
-;
-; Documentation: http://docs.basex.org/wiki/Clients
-;
-; (C) Andy Chambers, Formedix Ltd 2010, BSD License
+;; This example shows how database commands can be executed.
+;;
+;; (C) Andy Chambers, Formedix Ltd 2010, BSD License
+;; (C) Hans Hübner, 2013
 
 (defpackage :basex-user
- (:use :cl :basex))
+ (:use :cl))
 
 (in-package :basex-user)
 
 (time
- (let ((session (make-instance 'session)))
-  (if (execute session "xquery 1 to 10")
-      (print (result session))
-      (print (info session)))
-
-  (close-session session)))
+ (let ((session (basex:connect)))
+   (multiple-value-bind (result info)
+       (basex:execute session "xquery 1 to 10")
+     (format t "result: ~A~%info: ~A~%" result info))
+   (basex:disconnect session)))

@@ -1,9 +1,9 @@
-;; Lisp client for BaseX.
-;; Works with BaseX 6.1
+;; Common Lisp client for BaseX.
+;; Works with BaseX 7.6
 ;;
-;; Documentation: http://docs.basex.org/wiki/Clients
 ;; 
 ;; (C) Andy Chambers, Formedix Ltd 2010, BSD License
+;; (C) Hans Hübner, 2013
 
 (defpackage :basex
   (:use :cl)
@@ -68,8 +68,8 @@
       (hand-shake socket user password)
       (make-instance 'session :socket socket))))
 
-(defmethod disconnect ((self session))
-  (with-slots (socket) self
+(defmethod disconnect ((session session))
+  (let ((socket (socket session)))
     (ignore-errors
      (write-null-terminated "exit" socket)
      (usocket:socket-close socket))))
@@ -104,8 +104,8 @@
         do (write-byte byte (usocket:socket-stream socket)))
   (write-byte 0 (usocket:socket-stream socket)))
 
-(defmethod execute ((self session) query)
-  (with-slots (socket) self
+(defmethod execute ((session session) query)
+  (let ((socket (socket session)))
     (write-null-terminated query socket)
     (force-output (usocket:socket-stream socket))
     (let* ((result (read-null-terminated socket))
